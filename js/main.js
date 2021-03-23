@@ -12,7 +12,6 @@ const buttonCart = document.querySelector('.button-cart');
 const modalCart = document.querySelector('#modal-cart');
 const modalClose = document.querySelector('.modal-close');
 const scrollLink = document.querySelectorAll('a.scroll-link');
-const modalCloseBody = document.getElementById('.overlay');
 
 (function () {
 	for (let i = 0; i < scrollLink.length; i++) {
@@ -37,7 +36,6 @@ const closeModal = function () {
 
 modalCart.addEventListener('click', (event) => {
 	const target = event.target;
-	console.log(target);
 	if (target.classList.contains('show')) {
 		closeModal();
 	}
