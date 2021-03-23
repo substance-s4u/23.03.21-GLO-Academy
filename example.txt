@@ -1,4 +1,0 @@
-This example Git text file
-
-git commit -m "hehe"
-
