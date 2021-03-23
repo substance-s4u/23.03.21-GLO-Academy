@@ -36,7 +36,7 @@ const closeModal = function () {
 
 modalCart.addEventListener('click', (event) => {
 	const target = event.target;
-	if (target.classList.contains('show')) {
+	if (target.classList.contains('overlay')) {
 		closeModal();
 	}
 });
