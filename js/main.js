@@ -46,3 +46,5 @@ modalCart.addEventListener('click', (event) => {
 
 buttonCart.addEventListener('click', openModal);
 modalClose.addEventListener('click', closeModal);
+
+
