@@ -12,8 +12,9 @@ const buttonCart = document.querySelector('.button-cart');
 const modalCart = document.querySelector('#modal-cart');
 const modalClose = document.querySelector('.modal-close');
 const scrollLink = document.querySelectorAll('a.scroll-link');
+const modalCloseBody = document.getElementById('.overlay');
 
-(function() {
+(function () {
 	for (let i = 0; i < scrollLink.length; i++) {
 		scrollLink[i].addEventListener('click', function (event) {
 			event.preventDefault();
@@ -33,6 +34,14 @@ const openModal = function () {
 const closeModal = function () {
 	modalCart.classList.remove('show');
 };
+
+modalCart.addEventListener('click', (event) => {
+	const target = event.target;
+	console.log(target);
+	if (target.classList.contains('show')) {
+		closeModal();
+	}
+});
 
 
 
