@@ -29,11 +29,11 @@ const modalClose = document.querySelector('.modal-close');
 
 
 
-const openModal =  () => {
+const openModal = () => {
 	modalCart.classList.add('show');
 };
 
-const closeModal =  () => {
+const closeModal = () => {
 	modalCart.classList.remove('show');
 };
 
@@ -54,39 +54,42 @@ modalClose.addEventListener('click', closeModal);
 {
 	const scrollLinks = document.querySelectorAll('a.scroll-link');
 
-for (const scrollLink of scrollLinks){
-			scrollLink.addEventListener('click', function (event) {
-				event.preventDefault();
-				const id = scrollLink.getAttribute('href');
-				document.querySelector(id).scrollIntoView({
-					behavior: 'smooth',
-					block: 'start',
-				});											
+	for (const scrollLink of scrollLinks) {
+		scrollLink.addEventListener('click', function (event) {
+			event.preventDefault();
+			const id = scrollLink.getAttribute('href');
+			document.querySelector(id).scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
 			});
-		}
-
+		});
 	}
-	{
-		const scrollLinks = document.querySelectorAll('a.scroll-link');
-	
-	for (const scrollLink of scrollLinks){
-				scrollLink.addEventListener('click', function (event) {
-					event.preventDefault();
-					const id = scrollLink.getAttribute('href');
-					document.querySelector(id).scrollIntoView({
-						behavior: 'smooth',
-						block: 'start',
-					});											
-				});
-			}
-	
-		}
+
+}
+{
+	const scrollLinks = document.querySelectorAll('a.scroll-link');
+
+	for (const scrollLink of scrollLinks) {
+		scrollLink.addEventListener('click', function (event) {
+			event.preventDefault();
+			const id = scrollLink.getAttribute('href');
+			document.querySelector(id).scrollIntoView({
+				behavior: 'smooth',
+				block: 'start',
+			});
+		});
+	}
+
+}
 
 //goods
 
 
-const navigationLink = document.querySelectorAll('.navigation-link');
+const navigationLink = document.querySelectorAll('.navigation-link:not(.view-all)');
 const longGoodsList = document.querySelector('.long-goods-list');
+const viewAll = document.querySelectorAll('.view-all');
+const showClothing = document.querySelector('.show-clothing');
+const showAccessories = document.querySelector('.show-accessories');
 
 const getGoods = async () => {
 	const result = await fetch('db/db.json');
@@ -96,7 +99,7 @@ const getGoods = async () => {
 	return result.json();
 }
 
-const createCard = ({label,name,img,description,price,id}) => {
+const createCard = ({ label, name, img, description, price, id }) => {
 	const card = document.createElement('div');
 	card.className = 'col-lg-3 col-sm-6'
 
@@ -108,7 +111,7 @@ const createCard = ({label,name,img,description,price,id}) => {
 
 	card.innerHTML = `
 				<div class="goods-card">
-				${label ? `<span class="label">${label}</span>` : '' }
+				${label ? `<span class="label">${label}</span>` : ''}
 
 					<img src="db/${img}" alt="${name}" class="goods-image">
 					<h3 class="goods-title">${name}</h3>
@@ -133,21 +136,26 @@ const renderCards = (data) => {
 	document.body.classList.add('show-goods')
 };
 
-// more.addEventListener('click', (event) => {
-// 	event.preventDefault();
-// 	getGoods().then(renderCards);
-// });
+
+const showAll = (event) => {
+		event.preventDefault();
+		getGoods().then(renderCards);
+	}
+
+	viewAll.forEach((elem)=>{
+		elem.addEventListener('click', showAll);
+	});
 
 
 const filterCards = (field, value) => {
 	getGoods()
-	.then( (data) => {
-		const filteredGoods = data.filter((good) => {
-			return good[field] === value
+		.then((data) => {
+			const filteredGoods = data.filter((good) => {
+				return good[field] === value
+			})
+			return filteredGoods;
 		})
-		return filteredGoods;
-	})
-	.then(renderCards);
+		.then(renderCards);
 }
 
 navigationLink.forEach(function (link) {
@@ -159,17 +167,25 @@ navigationLink.forEach(function (link) {
 	})
 })
 
-const thing = addEventListener('click', (event) => {
-	const target = event.target;
-	if (target.classList.contains('things') || target.classList.contains('more')) {
-		event.preventDefault();
-	getGoods().then(renderCards);
-	}
-});
+// const thing = addEventListener('click', (event) => {
+// 	const target = event.target;
+// 	if (target.classList.contains('things') || target.classList.contains('more')) {
+// 		event.preventDefault();
+// 		getGoods().then(renderCards);
+// 	}
+// });									My old try with "ALL" and "View ALL"
 
 
-const check = addEventListener('click', (event) => {
-	const target = event.target;
-	console.log(target);
-})
+// const check = addEventListener('click', (event) => {
+// 	const target = event.target;
+// 	console.log(target);
+// })
 
+
+
+// showClothing.forEach(item => {
+// 	item.addEventListener('click', event => {
+// 		event.preventDefault();
+// 		filterCards('category', 'Clothing');
+// 	});
+// });
