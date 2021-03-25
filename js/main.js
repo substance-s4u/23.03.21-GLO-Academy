@@ -17,8 +17,8 @@ const viewAll = document.querySelectorAll('.view-all');
 const showClothing = document.querySelectorAll('.show-clothing');
 const showAccessories = document.querySelectorAll('.show-accessories');
 const scrollLinks = document.querySelectorAll('a.scroll-link');
-const cardTableGoods = document.querySelector('.cart-table__goods');
-const cardTableTotals = document.querySelector('.card-table__total');
+const cartTableGoods = document.querySelector('.cart-table__goods');
+const cardTableTotal = document.querySelector('.card-table__total');
 
 const getGoods = async () => {
 	const result = await fetch('db/db.json');
@@ -28,12 +28,110 @@ const getGoods = async () => {
 	return result.json();
 }
 
+const cart = {
+	cartGoods: [],
+	renderCart(){
+		cartTableGoods.textContent = '';
+		this.cartGoods.forEach(({id,name,price,count})=>{
+			const trGood = document.createElement('tr');
+			trGood.className = 'cart-item';
+			trGood.dataset.id = id;
+
+			trGood.innerHTML = `
+					<td>${name}</td>
+					<td>${price}</td>
+					<td><button class="cart-btn-minus">-</button></td>
+					<td>${count}</td>
+					<td><button class="cart-btn-plus">+</button></td>
+					<td>${price * count}</td>
+					<td><button class="cart-btn-delete">x</button ></td>
+			`;
+			cartTableGoods.append(trGood);
+			});
+
+			const totalPrice = this.cartGoods.reduce((sum,item) => {
+				return sum + (item.price * item.count);
+			}, 0);
+			cardTableTotal.textContent = totalPrice + '$';
+	},
+	
+	deleteGood(id){
+		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
+		this.renderCart();
+	},	
+	minusGood(id){
+		for (const item of this.cartGoods){
+			if (item.id === id){
+				if (item.count <= 1){
+					this.deleteGood(id)
+				} else {
+					item.count--;
+				}
+				break;
+			}
+		}
+		this.renderCart();
+	}, 
+	plusGood(id){
+		for (const item of this.cartGoods){
+			if (item.id === id){
+				item.count++;
+				break;
+			}
+		}
+		this.renderCart();
+	},
+	addCartGoods(id){
+		const goodItem = this.cartGoods.find( item => item.id === id);
+		if(goodItem) {
+			this.plusGood(id);
+		} else {
+			getGoods()
+				.then(data => data.find(item => item.id === id))
+				.then(({id, name,price}) => {
+					this.cartGoods.push({
+						id,
+						name,
+						price,
+						count: 1
+					});
+				}); 
+		}
+	},
+}
+
+document.body.addEventListener('click', event => {
+	const addToCart = event.target.closest('.add-to-cart');
+	if (addToCart){
+		cart.addCartGoods(addToCart.dataset.id);
+	}
+})
+
+cartTableGoods.addEventListener('click', event => {
+	const target = event.target;
+	if (target.classList.contains('cart-btn-delete')) {
+		const id = target.closest('.cart-item').dataset.id;
+		cart.deleteGood(id);
+	};
+	if (target.classList.contains('cart-btn-minus')){
+		const id = target.closest('.cart-item').dataset.id;
+		cart.minusGood(id);
+	}
+	if (target.classList.contains('cart-btn-plus')){
+		const id = target.closest('.cart-item').dataset.id;
+		cart.plusGood(id);
+	}
+});
+
 const openModal = () => {
+	cart.renderCart();
 	modalCart.classList.add('show');
+	
 };
 
 const closeModal = () => {
 	modalCart.classList.remove('show');
+	
 };
 
 buttonCart.addEventListener('click', openModal);
@@ -41,7 +139,7 @@ modalClose.addEventListener('click', closeModal);
 
 {
 	for (const scrollLink of scrollLinks) {
-		scrollLink.addEventListener('click', event => {
+		scrollLink.addEventListener('click', (event) => {
 			event.preventDefault();
 			const id = scrollLink.getAttribute('href');
 			document.querySelector(id).scrollIntoView({
