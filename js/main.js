@@ -19,6 +19,8 @@ const showAccessories = document.querySelectorAll('.show-accessories');
 const scrollLinks = document.querySelectorAll('a.scroll-link');
 const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
+const cartCount = document.querySelector('.cart-count');
+const btnDanger = document.querySelector('.btn-danger');
 
 const getGoods = async () => {
 	const result = await fetch('db/db.json');
@@ -29,10 +31,20 @@ const getGoods = async () => {
 }
 
 const cart = {
-	cartGoods: [],
-	renderCart(){
+	cartGoods: [],			//Щетчик корзины
+	countQuantity() {
+		cartCount.textContent = this.cartGoods.reduce((sum, item) => {
+			return sum + item.count
+		}, 0)
+	},
+	clearCart() {
+		this.cartGoods.length = 0;
+		this.countQuantity();
+		this.renderCart();
+	},
+	renderCart() {
 		cartTableGoods.textContent = '';
-		this.cartGoods.forEach(({id,name,price,count})=>{
+		this.cartGoods.forEach(({ id, name, price, count }) => {
 			const trGood = document.createElement('tr');
 			trGood.className = 'cart-item';
 			trGood.dataset.id = id;
@@ -47,22 +59,23 @@ const cart = {
 					<td><button class="cart-btn-delete">x</button ></td>
 			`;
 			cartTableGoods.append(trGood);
-			});
+		});
 
-			const totalPrice = this.cartGoods.reduce((sum,item) => {
-				return sum + (item.price * item.count);
-			}, 0);
-			cardTableTotal.textContent = totalPrice + '$';
+		const totalPrice = this.cartGoods.reduce((sum, item) => {
+			return sum + (item.price * item.count);
+		}, 0);
+		cardTableTotal.textContent = totalPrice + '$';
 	},
-	
-	deleteGood(id){
+
+	deleteGood(id) {
 		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
 		this.renderCart();
-	},	
-	minusGood(id){
-		for (const item of this.cartGoods){
-			if (item.id === id){
-				if (item.count <= 1){
+		this.countQuantity();
+	},
+	minusGood(id) {
+		for (const item of this.cartGoods) {
+			if (item.id === id) {
+				if (item.count <= 1) {
 					this.deleteGood(id)
 				} else {
 					item.count--;
@@ -71,38 +84,44 @@ const cart = {
 			}
 		}
 		this.renderCart();
-	}, 
-	plusGood(id){
-		for (const item of this.cartGoods){
-			if (item.id === id){
+		this.countQuantity();
+	},
+	plusGood(id) {
+		for (const item of this.cartGoods) {
+			if (item.id === id) {
 				item.count++;
 				break;
 			}
 		}
 		this.renderCart();
+		this.countQuantity();
 	},
-	addCartGoods(id){
-		const goodItem = this.cartGoods.find( item => item.id === id);
-		if(goodItem) {
+	addCartGoods(id) {
+		const goodItem = this.cartGoods.find(item => item.id === id);
+		if (goodItem) {
 			this.plusGood(id);
 		} else {
 			getGoods()
 				.then(data => data.find(item => item.id === id))
-				.then(({id, name,price}) => {
+				.then(({ id, name, price }) => {
 					this.cartGoods.push({
 						id,
 						name,
 						price,
 						count: 1
 					});
-				}); 
+					this.countQuantity();
+				});
 		}
 	},
 }
+btnDanger.addEventListener('click', () => {
+	cart.clearCart();
+})
 
 document.body.addEventListener('click', event => {
 	const addToCart = event.target.closest('.add-to-cart');
-	if (addToCart){
+	if (addToCart) {
 		cart.addCartGoods(addToCart.dataset.id);
 	}
 })
@@ -113,11 +132,11 @@ cartTableGoods.addEventListener('click', event => {
 		const id = target.closest('.cart-item').dataset.id;
 		cart.deleteGood(id);
 	};
-	if (target.classList.contains('cart-btn-minus')){
+	if (target.classList.contains('cart-btn-minus')) {
 		const id = target.closest('.cart-item').dataset.id;
 		cart.minusGood(id);
 	}
-	if (target.classList.contains('cart-btn-plus')){
+	if (target.classList.contains('cart-btn-plus')) {
 		const id = target.closest('.cart-item').dataset.id;
 		cart.plusGood(id);
 	}
@@ -126,12 +145,12 @@ cartTableGoods.addEventListener('click', event => {
 const openModal = () => {
 	cart.renderCart();
 	modalCart.classList.add('show');
-	
+
 };
 
 const closeModal = () => {
 	modalCart.classList.remove('show');
-	
+
 };
 
 buttonCart.addEventListener('click', openModal);
@@ -174,7 +193,7 @@ const createCard = ({ label, name, img, description, price, id }) => {
 						<span class="button-price">$${price}</span>
 					</button>
 				</div>			
-	`;	
+	`;
 	return card;
 };
 

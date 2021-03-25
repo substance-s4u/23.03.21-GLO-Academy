@@ -345,6 +345,10 @@ button {
     margin-right: 15px;
 }
 
+.btn-danger {
+    background-color: tomato
+}
+
 .payment-logo {
     vertical-align: middle;
     margin-right: 25px;
