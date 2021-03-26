@@ -21,6 +21,7 @@ const cartTableGoods = document.querySelector('.cart-table__goods');
 const cardTableTotal = document.querySelector('.card-table__total');
 const cartCount = document.querySelector('.cart-count');
 const btnDanger = document.querySelector('.btn-danger');
+const buttonCartBuy = document.querySelector('.cart-buy');
 
 const getGoods = async () => {
 	const result = await fetch('db/db.json');
@@ -238,9 +239,51 @@ showAccessories.forEach(item => {
 	})
 })
 
+
+// SERVER
+
 showClothing.forEach(item => {
 	item.addEventListener('click', event => {
 		event.preventDefault();
 		filterCards('category', 'Clothing');
 	})
+	const modalForm = document.querySelector('.modal-form');
+
+	const postData = dataUser => fetch('server.php', {
+		method: 'POST',
+		body: dataUser,
+	});
+	
+	modalForm.addEventListener('submit', event => {
+		event.preventDefault();
+	
+		const formData = new FormData(modalForm);
+		formData.append('cart', JSON.stringify(cart.cartGoods))
+	
+		postData(formData)
+		.then(response => {
+			if (!response.ok){
+				throw new Error(response.status);
+			}
+			alert('Ваш заказ успешно отправлен');
+			console.log(response.statusText);
+		})
+		.catch(err => {
+			alert('К сожалению произошла ошибка, повторите попытку позже');
+			console.error(err);
+		})
+		.finally(() =>{
+			closeModal();
+			modalForm.reset();
+			cart.cartGoods.length = 0;
+		});
+	
+	});
+			if (buttonCartBuy.textContent !== (A..z)){
+				console.log(good)
+			}
+		})
 })
+
+
+
