@@ -1,3 +1,4 @@
+
 const mySwiper = new Swiper('.swiper-container', {
 
 	loop: true,
@@ -33,10 +34,14 @@ const getGoods = async () => {
 
 const cart = {
 	cartGoods: [],			//Щетчик корзины
+	getCountCartGoods() {
+		return this.cartGoods.length
+	},
 	countQuantity() {
 		cartCount.textContent = this.cartGoods.reduce((sum, item) => {
-			return sum + item.count
+			return sum = item.count
 		}, 0)
+		cartCount.textContent = count ? count : '';
 	},
 	clearCart() {
 		this.cartGoods.length = 0;
@@ -70,8 +75,9 @@ const cart = {
 
 	deleteGood(id) {
 		this.cartGoods = this.cartGoods.filter(item => id !== item.id);
-		this.renderCart();
 		this.countQuantity();
+		this.renderCart();
+
 	},
 	minusGood(id) {
 		for (const item of this.cartGoods) {
@@ -84,8 +90,9 @@ const cart = {
 				break;
 			}
 		}
-		this.renderCart();
 		this.countQuantity();
+		this.renderCart();
+
 	},
 	plusGood(id) {
 		for (const item of this.cartGoods) {
@@ -94,8 +101,9 @@ const cart = {
 				break;
 			}
 		}
-		this.renderCart();
 		this.countQuantity();
+		this.renderCart();
+
 	},
 	addCartGoods(id) {
 		const goodItem = this.cartGoods.find(item => item.id === id);
@@ -186,7 +194,6 @@ const createCard = ({ label, name, img, description, price, id }) => {
 	card.innerHTML = `
 				<div class="goods-card">
 				${label ? `<span class="label">${label}</span>` : ''}
-
 					<img src="db/${img}" alt="${name}" class="goods-image">
 					<h3 class="goods-title">${name}</h3>
 					<p class="goods-description">${description}</p>					
@@ -253,37 +260,54 @@ showClothing.forEach(item => {
 		method: 'POST',
 		body: dataUser,
 	});
-	
+
+	const validForm = (formData) => {
+		let valid = false;
+
+		for (const [, value] of formData) {
+			if (value.trim()) {
+				valid = true
+			} else {
+				valid = false;
+				break;
+			}
+		}
+		return valid;
+	}
+
 	modalForm.addEventListener('submit', event => {
 		event.preventDefault();
-	
 		const formData = new FormData(modalForm);
-		formData.append('cart', JSON.stringify(cart.cartGoods))
-	
-		postData(formData)
-		.then(response => {
-			if (!response.ok){
-				throw new Error(response.status);
+
+		if (validForm(formData) && cart.getCountCartGoods()) {
+			formData.append('cart', JSON.stringify(cart.cartGoods))
+
+			postData(formData)
+				.then(response => {
+					if (!response.ok) {
+						throw new Error(response.status);
+					}
+					alert('Ваш заказ успешно отправлен');
+					console.log(response.statusText);
+				})
+				.catch(err => {
+					alert('К сожалению произошла ошибка, повторите попытку позже');
+					console.error(err);
+				})
+				.finally(() => {
+					closeModal();
+					modalForm.reset();
+					cart.clearCart();
+				});
+		} else {
+			if (!cart.getCountCartGoods()) {
+				alert('Добавте товары в корзину');
 			}
-			alert('Ваш заказ успешно отправлен');
-			console.log(response.statusText);
-		})
-		.catch(err => {
-			alert('К сожалению произошла ошибка, повторите попытку позже');
-			console.error(err);
-		})
-		.finally(() =>{
-			closeModal();
-			modalForm.reset();
-			cart.cartGoods.length = 0;
-		});
-	
-	});
-			if (buttonCartBuy.textContent !== (A..z)){
-				console.log(good)
+			if (!validForm(formData)) {
+				alert('Заповните поля правильно');
 			}
-		})
+		}
+	})
+
 })
-
-
 
